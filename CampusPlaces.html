@@ -1,0 +1,604 @@
+<!--
+Jeanette Yue
+HW 3 - CampusPlaces
+CampusPlaces.html
+
+This web app provdes different ways to interact with a list of the points of interest
+on the Welleseley campus.
+-->
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Campus Places</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-webapp-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="images/thumbnail.jpg">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, target-densityDpi=device-dpi" />
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="/js/jquery-1.6.4.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="function.js"></script>
+
+    <script>
+    var counter = 0;
+    var currentImage=1; //used for slideshow
+    var selectedImage=0 //used for selected image in the gallery
+
+    $(document).on("pageshow","#mapView",function(){
+      initialize();
+    });
+
+
+    </script>
+
+</head>
+
+<body onload="surprise();createImgs();populateList(1);populateList(2);">
+
+<div data-role="page"  data-theme="b" class="screen" id="info">
+
+    <div data-role="header">
+      <h1>About</h1>
+    </div>
+
+  <div data-role="content" class="ui-content">
+    <p> Welcome to Campus Places! Campus Places is a web app that provides
+      several ways to interact with a list of the points of interest on the
+      Wellesley campus. Below, you will find an explanation of how you can
+      interact with the list.
+
+      <div data-role="collapsible">
+        <h4>Map View</h4>
+        <p>Access the list via Google Maps and plan a trip! Each location
+        has a marker. When clicked, each marker will display an info window
+        complete with an image and description of the location.</p>
+      </div>
+
+      <div data-role="collapsible">
+        <h4>Slideshow</h4>
+        <p>Are you more of a visual person? Ignore text and shift a swipeable
+        (left and right) slideshow. If a spot catches your eyes, simply tap on
+        the image for a
+        popup description.</p>
+      </div>
+
+      <div data-role="collapsible">
+        <h4>List with Thumbnails</h4>
+        <p>Do want to to access a straightforward list with pictures without
+        all the fussy details? This option does exactly this and divides
+        points of interest by their location (east or west cmapus).</p>
+      </div>
+
+      <div data-role="collapsible">
+        <h4>Pick from Image Gallery</h4>
+        <p>Want more pictures but on one screen? This option has two times more
+          images than Slideshow and provides a caption of the location's
+          description.</p>
+      </div>
+
+      <div data-role="collapsible">
+        <h4>Surprise Me!</h4>
+        <p>Can't decide? Let the app choose for you!</p>
+      </div>
+
+  </div>
+
+<div  data-role="footer" data-id="nav" data-position="fixed">
+  <div data-role="navbar">
+    <ul>
+      <li> <a href="#info" class="ui-btn-active ui-state-persist">About</a>
+      <li> <a href="#home">Campus Places</a>
+    </ul>
+  </div> <!--navbar-->
+</div> <!--footer-->
+</div> <!--page-->
+
+<div data-role="page" class="screen" id="home" data-theme="b">
+
+    <div data-role="header">
+      <h1>Campus Places</h1>
+      <a data-icon="info" href="#info" back-btn="false">Help</a>
+    </div>
+
+  <div data-role="content" class="ui-content">
+    <p>Pick an interaction style:</p>
+
+      <ul data-role="listview" data-inset="true">
+        <li><a href="#mapView">Map View</a></li>
+        <li><a href="#slideshow">Slideshow</a></li>
+        <li><a href="#listThumbnails">List with Thumbnails</a></li>
+        <li><a href="#imageGallery">Pick from Image Gallery</a></li>
+        <li><a href="" id="surprise" onclick="surprise()">Surprise Me!</a></li>
+      </ul>
+  </div>
+
+<div  data-role="footer" data-id="nav" data-position="fixed">
+  <div data-role="navbar">
+    <ul>
+      <li> <a href="#info">About</a>
+      <li> <a href="#home" class="ui-btn-active ui-state-persist">Home</a>
+    </ul>
+  </div> <!--navbar-->
+</div> <!--footer-->
+</div> <!--page-->
+
+
+<!---THIS IS THE START OF PAGES YOU WOULD BE DIRECTED TO VIA HOME SCREEN-->
+
+
+<div data-role="page" class="screen" id="mapView" data-theme="b">
+
+    <div data-role="header">
+      <a data-icon="back" data-rel="back" back-btn="true">Back</a>
+      <h1>Map View</h1>
+    </div>
+
+  <div data-role="content" class="ui-content">
+    <!-- <p> Explanation of how this page works</p> -->
+
+
+    <div id="map_wrapper">
+      <div id="basic_map"></div>
+    </div>
+
+  </div>
+
+<div  data-role="footer" data-id="nav" data-position="fixed">
+  <div data-role="navbar">
+    <ul>
+      <li> <a href="#info">About</a>
+      <li> <a href="#home">Campus Places</a>
+    </ul>
+  </div> <!--navbar-->
+</div> <!--footer-->
+</div> <!--page-->
+
+<div data-role="page" class="screen" id="slideshow" data-theme="b">
+
+    <div data-role="header">
+      <a data-icon="back" data-rel="back" back-btn="true">Back</a>
+      <h1>Slideshow</h1>
+    </div>
+
+  <div data-role="content" class="ui-content">
+    <div id="swipe_Area">
+
+        <a href="#popupDialog" data-rel="popup" data-position-to="window"
+        data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inlineui-btn-b">
+        <img src="images/1.jpg" id="centerImg"></a>
+
+        <div data-role="popup" id="popupDialog" data-dismissible="false" style="max-width:400px;">
+
+          <div data-role="header">
+            <h1 id="popupName">Davis Museum</h1>
+          </div>
+
+          <div role="main" class="ui-content" >
+            <p id="popupDescription">The Davis is home to distinguished permanent collections from
+              around the globe; holdings include paintings, sculptures, works
+              on paper, photographs, and decorative objects, from antiquity to
+               the contemporary moment. Dynamic gallery presentations and richly
+               varied temporary exhibitions are designed to engage visitors in
+               looking anew at the visual arts, and enhance the Davis’s role as
+               a vital campus resource for cross-disciplinary teaching and
+               study.</p>
+            <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back" data-transition="flow">Back</a>
+          </div>
+        </div>
+    </div>
+
+  </div>
+
+<div  data-role="footer" data-id="nav" data-position="fixed">
+  <div data-role="navbar">
+    <ul>
+      <li> <a href="#info">About</a>
+      <li> <a href="#home">Campus Places</a>
+    </ul>
+  </div> <!--navbar-->
+</div> <!--footer-->
+</div> <!--page-->
+
+<div data-role="page" class="screen" id="listThumbnails" data-theme="b">
+
+    <div data-role="header">
+      <a data-icon="back" data-rel="back" back-btn="true">Back</a>
+      <h1>List with Thumbnails</h1>
+    </div>
+
+  <div data-role="content" class="ui-content">
+    <!-- <p> Explanation of how this page works</p> -->
+
+<ul data-role="listview">
+  <li data-role="list-divider">East Campus</li>
+  <div id="east">
+
+  </div>
+
+  <li data-role="list-divider">West Campus</li>
+<div id="west">
+
+</div>
+  </div>
+
+<div  data-role="footer" data-id="nav" data-position="fixed">
+  <div data-role="navbar">
+    <ul>
+      <li> <a href="#info">About</a>
+      <li> <a href="#home">Campus Places</a>
+    </ul>
+  </div> <!--navbar-->
+</div> <!--footer-->
+</div> <!--page-->
+
+<div data-role="page" class="screen" id="imageGallery" data-theme="b">
+
+    <div data-role="header">
+      <a data-icon="back" data-rel="back" back-btn="true">Back</a>
+      <h1>Pick from Image Gallery</h1>
+    </div>
+
+  <div data-role="content" class="ui-content">
+<div id="gallery">
+      <div data-role="popup" id="popupInfo" class="ui-content"><p id="popuptext"><img id="zoom" src="images/1.jpg"></p></div>
+    </div>
+
+    <div id="information">
+    </div>
+  </div>
+
+<div  data-role="footer" data-id="nav" data-position="fixed">
+  <div data-role="navbar">
+    <ul>
+      <li> <a href="#info">About</a>
+      <li> <a href="#home">Campus Places</a>
+    </ul>
+  </div> <!--navbar-->
+</div> <!--footer-->
+</div> <!--page-->
+
+
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false">
+</script>
+<script type="text/javascript">
+
+var davisDescription = "The Davis is home to distinguished permanent "+
+"collections from around the globe; holdings include paintings, sculptures, "+
+"works on paper, photographs, and decorative objects, from antiquity to the "+
+"contemporary moment. Dynamic gallery presentations and richly varied "+
+"temporary exhibitions are designed to engage visitors in looking anew at "+
+"the visual arts, and enhance the Davis’s role as a vital campus resource "+
+"for cross-disciplinary teaching and study.";
+
+var davisInfo = '<div class="window">'+
+      '<div id="siteNotice">'+
+      '</div>'+
+      '<h1 id="firstHeading" class="firstHeading">Davis Museum</h1>'+
+      '<div id="bodyContent">'+
+      '<img src="images/1.jpg" class="mapThumb">'+
+      '<q>'+davisDescription+'</q>'+
+      '<p><a href="https://www.wellesley.edu/davismuseum/about-davis">'+
+      'Wellesley College</a></p>'+
+      '</div>'+
+      '</div>';
+
+var luluDescription = "The Lulu Chow Wang Campus Center, with its "+
+"labyrinth-like layout and unexpected open spaces, provides an inviting "+
+"place where members of the Wellesley community can gather for impromptu "+
+"conversation or more formal meetings of the College's 160 student "+
+"organizations and College Government. The 'Lulu' houses a bookstore, dining "+
+"area and coffee bar, cafe and pub, large multipurpose spaces for "+
+"performances and social functions, and meeting rooms.";
+
+var luluInfo = '<div class="window">'+
+      '<div id="siteNotice">'+
+      '</div>'+
+      '<h1 id="firstHeading" class="firstHeading">Lulu Chow Wang Campus Center</h1>'+
+      '<div id="bodyContent">'+
+      '<img src="images/9.jpg" class="mapThumb">'+
+      '<q>'+luluDescription+'</q>'+
+      '<p><a href="http://www.wellesley.edu/studentlife/campus/centers/wangcampuscenter">'+
+      'Wellesley College</a></p>'+
+      '</div>'+
+      '</div>';
+
+var jewettDescription = "The Center consists of the Mary Cooper Jewett Art "+
+"Wing and the Margaret Weyerhaeuser Jewett Music Wing. Located in the east "+
+"section of the building, the Music Wing holds the Music Library, Sound Lab, "+
+"listening rooms, practice studios, classrooms, departmental offices, and a "+
+"collection of musical instruments from various periods available for "+
+"students use. The Art Wing consists of classrooms, studios, photography "+
+"darkrooms, video and computer facilities, the Art Library, and a gallery for "+
+"student work.";
+
+var jewettInfo = '<div class="window">'+
+      '<div id="siteNotice">'+
+      '</div>'+
+      '<h1 id="firstHeading" class="firstHeading">Jewett Arts Center</h1>'+
+      '<div id="bodyContent">'+
+      '<img src="images/13.jpg" class="mapThumb">'+
+      '<q>'+jewettDescription+'</q>'+
+      '<p><a href="http://www.wellesley.edu/music/facilities/jewettsubpage">'+
+      'Wellesley College</a></p>'+
+      '</div>'+
+      '</div>';
+
+var wabanDescription = "One of the most tranquil spots on the Wellesley "+
+"campus, Lake Waban offers limitless opportunities for recreation, sports, "+
+"or simple contemplation. Students can always be found training for "+
+"intramural crew regattas, floating around the lake in a college canoe, and "+
+"studying (or sleeping) on Green Beach. Each fall all of the Wellesley "+
+"residence halls compete in crew races on Lake Waban to see which "+
+"is the fastest.";
+
+var wabanInfo = '<div class="window">'+
+      '<div id="siteNotice">'+
+      '</div>'+
+      '<h1 id="firstHeading" class="firstHeading">Lake Waban</h1>'+
+      '<div id="bodyContent">'+
+      '<img src="images/11.jpg" class="mapThumb">'+
+      '<q>'+wabanDescription+'</q>'+
+      '<p><a href="http://web.wellesley.edu/Admission/virtual/waban.html">'+
+      'Wellesley College</a></p>'+
+      '</div>'+
+      '</div>';
+
+var scienceDescription = "The Science Center comprises four buildings: the "+
+"Margaret Fergusson Greenhouses; Sage Hall; the Laboratory Wing; and the "+
+"E-wing.  The Science Center serves as the home of Science, Technology, "+
+"Engineering, and Mathematics at Wellesley College, and houses all the "+
+"science departments and programs offered at the College.";
+
+var scienceInfo = '<div class="window">'+
+      '<div id="siteNotice">'+
+      '</div>'+
+      '<h1 id="firstHeading" class="firstHeading">Science Center</h1>'+
+      '<div id="bodyContent">'+
+      '<img src="images/5.jpg" class="mapThumb">'+
+      '<q>'+scienceDescription+'</q>'+
+      '<p><a href="http://www.wellesley.edu/sciencecenter/visitors">'+
+      'Wellesley College</a></p>'+
+      '</div>'+
+      '</div>';
+
+var towerDescription = "Tower Court was the first building to be completed "+
+"after a fire in 1914 destroyed the heart and soul Wellesley's original "+
+"campus, College Hall. Built upon the site of the old building, Tower "+
+"initiated a new era in Wellesley's development, beginning the growth that "+
+"would ultimately bring Wellesley to its current existence. In tribute to the "+
+"stunning beauty of College Hall, Tower displays many exquisite examples of "+
+"Elizabethan Gothic and Georgian-style architecture. The sundial in the "+
+"center of the yard was given by Wellesley's first graduating class (1879).";
+
+var towerInfo = '<div class="window">'+
+      '<div id="siteNotice">'+
+      '</div>'+
+      '<h1 id="firstHeading" class="firstHeading">Tower Court</h1>'+
+      '<div id="bodyContent">'+
+      '<img src="images/7.jpg" class="mapThumb">'+
+      '<q>'+towerDescription+'</q>'+
+      '<p><a href="http://web.wellesley.edu/Admission/virtual/tower.html">'+
+      'Wellesley College</a></p>'+
+      '</div>'+
+      '</div>';
+
+var clappDescription = "Named for Wellesley's eighth president, the Margaret "+
+"Clapp Library is the centerpiece of the College library system, which "+
+"contains over a million volumes. The entire system is fully automated, with "+
+"an online catalog that can be accessed 24 hours a day. Wellesley is a "+
+"member of the Boston Consortium of Academic and Research Libraries, which "+
+"gives students access to libraries all over the Boston area. We have "+
+"reciprocal borrowing privileges with MIT."
+
+var clappInfo = '<div class="window">'+
+      '<div id="siteNotice">'+
+      '</div>'+
+      '<h1 id="firstHeading" class="firstHeading">Clapp Library</h1>'+
+      '<div id="bodyContent">'+
+      '<img src="images/3.jpg" class="mapThumb">'+
+      '<q>'+clappDescription+'</q>'+
+      '<p><a href="http://www.wellesley.edu/academics/centers/clapplibrary">'+
+      'Wellesley College</a></p>'+
+      '</div>'+
+      '</div>';
+
+
+
+
+      $(document).on("pagecreate","#slideshow",function(){
+        $("#swipe_Area").on("swipeleft",function(){
+          if (currentImage>12) currentImage=1;
+          else currentImage+=2;
+
+          if (currentImage==1) {
+            document.getElementById("popupName").innerHTML = "Davis Museum";
+            document.getElementById("popupDescription").innerHTML = davisDescription;
+          }
+          else if (currentImage==3){
+            document.getElementById("popupName").innerHTML = "Clapp Library";
+            document.getElementById("popupDescription").innerHTML = clappDescription;
+          }
+          else if (currentImage==5){
+            document.getElementById("popupName").innerHTML = "Science Center";
+            document.getElementById("popupDescription").innerHTML = scienceDescription;
+          }
+          else if (currentImage==7){
+            document.getElementById("popupName").innerHTML = "Tower Court";
+            document.getElementById("popupDescription").innerHTML = towerDescription;
+          }
+          else if (currentImage==9){
+            document.getElementById("popupName").innerHTML = "Lulu Chow Wang Campus Center";
+            document.getElementById("popupDescription").innerHTML = luluDescription;
+          }
+          else if (currentImage==11){
+            document.getElementById("popupName").innerHTML = "Lake Waban";
+            document.getElementById("popupDescription").innerHTML = wabanDescription;
+          }
+          else if (currentImage==13){
+            document.getElementById("popupName").innerHTML = "Jewett Arts Center";
+            document.getElementById("popupDescription").innerHTML = jewettpDescription;
+          }
+          document.getElementById("centerImg").src="images/"+currentImage+".jpg";
+        });
+      });
+
+      $(document).on("pagecreate","#slideshow",function(){
+        $("#swipe_Area").on("swiperight",function(){
+          if (currentImage<2) currentImage=13;
+          else currentImage-=2;
+
+          if (currentImage==1) {
+            document.getElementById("popupName").innerHTML = "Davis Museum";
+            document.getElementById("popupDescription").innerHTML = davisDescription;
+          }
+          else if (currentImage==3){
+            document.getElementById("popupName").innerHTML = "Clapp Library";
+            document.getElementById("popupDescription").innerHTML = clappDescription;
+          }
+          else if (currentImage==5){
+            document.getElementById("popupName").innerHTML = "Science Center";
+            document.getElementById("popupDescription").innerHTML = scienceDescription;
+          }
+          else if (currentImage==7){
+            document.getElementById("popupName").innerHTML = "Tower Court";
+            document.getElementById("popupDescription").innerHTML = towerDescription;
+          }
+          else if (currentImage==9){
+            document.getElementById("popupName").innerHTML = "Lulu Chow Wang Campus Center";
+            document.getElementById("popupDescription").innerHTML = luluDescription;
+          }
+          else if (currentImage==11){
+            document.getElementById("popupName").innerHTML = "Lake Waban";
+            document.getElementById("popupDescription").innerHTML = wabanDescription;
+          }
+          else if (currentImage==13){
+            document.getElementById("popupName").innerHTML = "Jewett Arts Center";
+            document.getElementById("popupDescription").innerHTML = jewettpDescription;
+          }
+          document.getElementById("centerImg").src="images/"+currentImage+".jpg";
+        });
+      });
+
+  function initialize() {
+    var myOptions = {
+      zoom: 15,
+      center: new google.maps.LatLng(42.292948, -71.308758),
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    };
+    var map = new google.maps.Map(document.getElementById("basic_map"), myOptions);
+
+    var davisWindow = new google.maps.InfoWindow({
+        content: davisInfo
+      });
+
+    var davis = new google.maps.Marker({
+      position: new google.maps.LatLng(42.299312, -71.308361),
+      map: map,
+    });
+
+    davis.addListener('click', function() {
+      davisWindow.open(map, davis);
+    });
+
+
+    var luluWindow = new google.maps.InfoWindow({
+        content: luluInfo
+      });
+
+      var lulu = new google.maps.Marker({
+        position: new google.maps.LatLng(42.294817, -71.309006),
+        map: map,
+      });
+
+      lulu.addListener('click', function() {
+        luluWindow.open(map, lulu);
+      });
+
+
+
+      var jewettWindow = new google.maps.InfoWindow({
+          content: jewettInfo
+        });
+
+      var jewett = new google.maps.Marker({
+        position: new google.maps.LatLng(42.293946, -71.306702),
+        map: map,
+      });
+
+        jewett.addListener('click', function() {
+          jewettWindow.open(map, jewett);
+        });
+
+
+      var wabanWindow = new google.maps.InfoWindow({
+          content: wabanInfo
+        });
+
+      var waban = new google.maps.Marker({
+        position: new google.maps.LatLng(42.287162, -71.309606),
+        map: map,
+      });
+
+        waban.addListener('click', function() {
+          wabanWindow.open(map, waban);
+        });
+
+
+
+        var scienceWindow = new google.maps.InfoWindow({
+            content: scienceInfo
+          });
+
+        var science = new google.maps.Marker({
+          position: new google.maps.LatLng(42.294002, -71.302774),
+          map: map,
+        });
+
+          science.addListener('click', function() {
+            scienceWindow.open(map, science);
+          });
+
+
+
+          var towerWindow = new google.maps.InfoWindow({
+              content: towerInfo
+            });
+
+          var tower = new google.maps.Marker({
+            position: new google.maps.LatLng(42.292948, -71.308758),
+            map: map,
+          });
+
+            tower.addListener('click', function() {
+              towerWindow.open(map, tower);
+            });
+
+
+
+
+            var clappWindow = new google.maps.InfoWindow({
+                content: clappInfo
+              });
+
+            var clapp = new google.maps.Marker({
+              position: new google.maps.LatLng(42.291758, -71.306488),
+              map: map,
+            });
+
+              clapp.addListener('click', function() {
+                clappWindow.open(map, clapp);
+              });
+
+  }
+
+</script>
+
+
+</body>
+</html>
